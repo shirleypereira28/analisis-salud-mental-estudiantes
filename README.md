@@ -17,9 +17,7 @@ Simulacion/
 │   └── exportar_dashboard.py     # Genera el dashboard HTML autocontenido
 ├── dashboard/
 │   └── index.html                # Dashboard interactivo (sin servidor requerido)
-├── docs/
-│   └── instrumento_encuesta.md   # Definición formal del instrumento
-├── SPEC.md                       # Especificación técnica completa
+├── instrumento_encuesta.md   # Definición formal del instrumento
 └── README.md
 ```
 
