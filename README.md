@@ -7,7 +7,7 @@ Prototipo funcional (TRL5) para la identificación temprana de factores de riesg
 ## Estructura del proyecto
 
 ```
-Simulacion/
+analisis-salud-mental-estudiantes/
 ├── data/
 │   ├── encuesta_raw.csv          # 96 registros simulados (respuestas crudas)
 │   └── encuesta_procesada.csv    # Datos con scores y nivel de riesgo calculados
