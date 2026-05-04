@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Bienestar Estudiantil</title>
+<link rel="stylesheet" href="./styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>Sistema de Análisis de Bienestar y Salud Mental Estudiantil</h1>
+  <p>Análisis descriptivo — 96 estudiantes universitarios · Semilla: 42</p>
+</header>
+
+<div class="container">
+
+  <!-- Guía de lectura -->
+  <div class="guide-card">
+    <h2>¿Cómo leer este dashboard?</h2>
+    <div class="guide-grid">
+
+      <div class="guide-section">
+        <h3>¿Qué es el Score?</h3>
+        <p>Cada estudiante respondió 35 preguntas en una escala del <strong>1 al 5</strong>, agrupadas en 7 dimensiones de bienestar. El <strong>score</strong> de cada dimensión es el promedio de sus 5 respuestas.</p>
+        <p style="margin-top:8px">El <strong>score total</strong> es un promedio <em>ponderado</em> de las 7 dimensiones. A mayor score, mayor nivel de riesgo.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3>Niveles de riesgo</h3>
+        <ul>
+          <li><span class="risk-badge badge-bajo">Bajo</span> Score &lt; 2.5 — bienestar estable</li>
+          <li style="margin-top:4px"><span class="risk-badge badge-medio">Medio</span> Score 2.5–3.4 — señales de alerta leves</li>
+          <li style="margin-top:4px"><span class="risk-badge badge-alto">Alto</span> Score 3.5–4.1 — requiere seguimiento</li>
+          <li style="margin-top:4px"><span class="risk-badge badge-critico">Crítico</span> Score ≥ 4.2 o ideación activa — intervención inmediata</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h3>Las 7 dimensiones</h3>
+        <ul>
+          <li><strong>Estrés</strong> — tensión por carga académica</li>
+          <li><strong>Ansiedad</strong> — preocupación y nerviosismo</li>
+          <li><strong>Carga Académica</strong> — volumen y tiempo de estudio</li>
+          <li><strong>Hábitos de Estudio</strong> — organización y constancia</li>
+          <li><strong>Depresión</strong> — tristeza, desmotivación, ideación</li>
+          <li><strong>Sueño</strong> — calidad y cantidad del descanso</li>
+          <li><strong>Apoyo Social</strong> — red de apoyo percibida</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h3>Pesos del modelo</h3>
+        <p>No todas las dimensiones pesan igual. Las de mayor impacto clínico tienen más peso en el score total:</p>
+        <ul style="margin-top:8px">
+          <li><strong>Depresión:</strong> 25%</li>
+          <li><strong>Estrés:</strong> 20%</li>
+          <li><strong>Ansiedad:</strong> 15%</li>
+          <li>Resto: 10% c/u</li>
+        </ul>
+        <p style="margin-top:8px; color:#c62828; font-size:.78rem">⚠ Si un estudiante responde 4 o 5 en el ítem de ideación (D4), se clasifica automáticamente como <strong>Crítico</strong>.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="kpi-grid" id="kpis"></div>
+
+  <!-- ── Nivel 1: Vista general ──────────────────────────────────────── -->
+  <div class="charts-grid">
+    <div class="gender-card">
+      <div class="chart-title">Composición demográfica por género</div>
+      <div class="gender-grid" id="c11"></div>
+    </div>
+
+    <!-- ── Nivel 2: Resumen de riesgo ──────────────────────────────────── -->
+    <div class="chart-card"><div class="chart-title">Distribución de niveles de riesgo</div><canvas id="c1"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Score promedio por dimensión</div><canvas id="c2"></canvas></div>
+    <div class="conc-card" id="conc-riesgo"></div>
+
+    <!-- ── Nivel 3: % en riesgo por dimensión ──────────────────────────── -->
+    <div class="chart-card full">
+      <div class="chart-title">% de estudiantes en riesgo por dimensión (score ≥ 3.5)</div>
+      <div class="rings-grid" id="c10"></div>
+    </div>
+    <div class="conc-card" id="conc-rings"></div>
+
+    <!-- ── Nivel 4: Progresión académica ───────────────────────────────── -->
+    <div class="chart-card full"><div class="chart-title">Distribución de riesgo por semestre</div><canvas id="c3"></canvas></div>
+    <div class="chart-card full"><div class="chart-title">Evolución de scores críticos por semestre</div><canvas id="c9"></canvas></div>
+    <div class="conc-card" id="conc-academica"></div>
+
+    <!-- ── Nivel 5: Segmentación y correlaciones ───────────────────────── -->
+    <div class="chart-card"><div class="chart-title">Bienestar global vs Score total</div><canvas id="c4"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Score promedio por programa académico</div><canvas id="c5"></canvas></div>
+    <div class="conc-card" id="conc-bienestar-programa"></div>
+    <div class="chart-card"><div class="chart-title">Depresión y estrés por estrato socioeconómico</div><canvas id="c6"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Nivel de riesgo por modalidad de estudio</div><canvas id="c7"></canvas></div>
+    <div class="conc-card" id="conc-estrato-modalidad"></div>
+    <div class="chart-card"><div class="chart-title">Nivel de riesgo: trabaja vs no trabaja</div><canvas id="c8"></canvas></div>
+    <div class="chart-card"><div class="chart-title">Score de sueño promedio por nivel de riesgo</div><canvas id="c12"></canvas></div>
+    <div class="conc-card" id="conc-trabajo-sueno"></div>
+  </div>
+
+</div>
+
+<footer>Prototipo funcional TRL5 · Datos simulados con fines académicos · seed=42</footer>
+
+<script>
+const D = {"kpis": {"total": 96, "n_critico": 12, "pct_alto_critico": 39.6, "dim_mayor": "Estrés", "bienestar_prom": 4.8}, "c1": {"labels": ["Bajo", "Medio", "Alto", "Crítico"], "data": [21, 37, 26, 12], "colors": ["#4fc3f7", "#1976d2", "#0d47a1", "#37474f"]}, "c2": {"labels": ["Estrés", "Ansiedad", "Carga Académica", "Hábitos de Estudio", "Depresión", "Sueño", "Apoyo Social"], "data": [3.31, 3.15, 3.29, 3.0, 3.1, 3.06, 3.27]}, "c3": {"labels": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], "datasets": [{"label": "Bajo", "data": [6, 0, 0, 1, 2, 4, 1, 3, 2, 2], "backgroundColor": "#4fc3f7"}, {"label": "Medio", "data": [6, 4, 3, 4, 3, 9, 0, 4, 3, 1], "backgroundColor": "#1976d2"}, {"label": "Alto", "data": [2, 3, 4, 6, 3, 1, 3, 0, 2, 2], "backgroundColor": "#0d47a1"}, {"label": "Crítico", "data": [0, 0, 3, 1, 3, 2, 0, 1, 1, 1], "backgroundColor": "#37474f"}]}, "c4": {"data": [{"x": 4.0, "y": 2, "riesgo": "Alto"}, {"x": 3.89, "y": 4, "riesgo": "Alto"}, {"x": 3.86, "y": 3, "riesgo": "Alto"}, {"x": 4.8, "y": 1, "riesgo": "Crítico"}, {"x": 3.3, "y": 5, "riesgo": "Medio"}, {"x": 4.35, "y": 1, "riesgo": "Crítico"}, {"x": 4.37, "y": 3, "riesgo": "Crítico"}, {"x": 3.04, "y": 5, "riesgo": "Medio"}, {"x": 2.13, "y": 7, "riesgo": "Bajo"}, {"x": 1.81, "y": 8, "riesgo": "Bajo"}, {"x": 2.56, "y": 6, "riesgo": "Medio"}, {"x": 3.56, "y": 5, "riesgo": "Alto"}, {"x": 2.75, "y": 6, "riesgo": "Medio"}, {"x": 2.64, "y": 7, "riesgo": "Medio"}, {"x": 3.04, "y": 6, "riesgo": "Medio"}, {"x": 3.78, "y": 3, "riesgo": "Alto"}, {"x": 1.45, "y": 9, "riesgo": "Bajo"}, {"x": 2.12, "y": 7, "riesgo": "Bajo"}, {"x": 2.83, "y": 7, "riesgo": "Medio"}, {"x": 3.59, "y": 4, "riesgo": "Alto"}, {"x": 3.12, "y": 4, "riesgo": "Medio"}, {"x": 3.98, "y": 3, "riesgo": "Alto"}, {"x": 2.28, "y": 6, "riesgo": "Bajo"}, {"x": 3.69, "y": 3, "riesgo": "Alto"}, {"x": 4.12, "y": 3, "riesgo": "Crítico"}, {"x": 2.07, "y": 6, "riesgo": "Bajo"}, {"x": 3.15, "y": 4, "riesgo": "Medio"}, {"x": 2.01, "y": 9, "riesgo": "Bajo"}, {"x": 3.37, "y": 3, "riesgo": "Medio"}, {"x": 3.19, "y": 4, "riesgo": "Medio"}, {"x": 2.76, "y": 5, "riesgo": "Medio"}, {"x": 3.6, "y": 3, "riesgo": "Alto"}, {"x": 3.93, "y": 4, "riesgo": "Alto"}, {"x": 1.71, "y": 8, "riesgo": "Bajo"}, {"x": 3.52, "y": 3, "riesgo": "Alto"}, {"x": 3.04, "y": 7, "riesgo": "Medio"}, {"x": 2.79, "y": 5, "riesgo": "Medio"}, {"x": 1.91, "y": 8, "riesgo": "Bajo"}, {"x": 3.35, "y": 4, "riesgo": "Medio"}, {"x": 3.98, "y": 4, "riesgo": "Alto"}, {"x": 1.92, "y": 7, "riesgo": "Bajo"}, {"x": 4.36, "y": 3, "riesgo": "Crítico"}, {"x": 3.13, "y": 7, "riesgo": "Medio"}, {"x": 1.86, "y": 7, "riesgo": "Bajo"}, {"x": 4.1, "y": 2, "riesgo": "Alto"}, {"x": 3.52, "y": 4, "riesgo": "Alto"}, {"x": 4.56, "y": 1, "riesgo": "Crítico"}, {"x": 2.55, "y": 6, "riesgo": "Medio"}, {"x": 3.35, "y": 4, "riesgo": "Medio"}, {"x": 2.15, "y": 6, "riesgo": "Bajo"}, {"x": 2.01, "y": 7, "riesgo": "Bajo"}, {"x": 3.03, "y": 4, "riesgo": "Medio"}, {"x": 1.93, "y": 6, "riesgo": "Bajo"}, {"x": 4.19, "y": 3, "riesgo": "Alto"}, {"x": 1.69, "y": 7, "riesgo": "Bajo"}, {"x": 3.49, "y": 5, "riesgo": "Medio"}, {"x": 2.87, "y": 5, "riesgo": "Medio"}, {"x": 4.51, "y": 3, "riesgo": "Crítico"}, {"x": 2.78, "y": 6, "riesgo": "Medio"}, {"x": 4.38, "y": 2, "riesgo": "Crítico"}, {"x": 3.6, "y": 4, "riesgo": "Alto"}, {"x": 3.53, "y": 5, "riesgo": "Alto"}, {"x": 2.75, "y": 6, "riesgo": "Medio"}, {"x": 3.41, "y": 6, "riesgo": "Medio"}, {"x": 2.61, "y": 5, "riesgo": "Medio"}, {"x": 3.35, "y": 3, "riesgo": "Medio"}, {"x": 3.12, "y": 5, "riesgo": "Medio"}, {"x": 4.29, "y": 3, "riesgo": "Crítico"}, {"x": 4.08, "y": 1, "riesgo": "Alto"}, {"x": 3.47, "y": 4, "riesgo": "Medio"}, {"x": 3.1, "y": 3, "riesgo": "Medio"}, {"x": 2.85, "y": 6, "riesgo": "Medio"}, {"x": 4.07, "y": 3, "riesgo": "Alto"}, {"x": 2.95, "y": 5, "riesgo": "Medio"}, {"x": 3.33, "y": 6, "riesgo": "Medio"}, {"x": 4.29, "y": 1, "riesgo": "Crítico"}, {"x": 2.62, "y": 5, "riesgo": "Medio"}, {"x": 2.49, "y": 5, "riesgo": "Bajo"}, {"x": 4.0, "y": 4, "riesgo": "Alto"}, {"x": 3.06, "y": 6, "riesgo": "Medio"}, {"x": 3.51, "y": 4, "riesgo": "Alto"}, {"x": 2.67, "y": 7, "riesgo": "Medio"}, {"x": 3.29, "y": 6, "riesgo": "Medio"}, {"x": 1.97, "y": 7, "riesgo": "Bajo"}, {"x": 2.22, "y": 8, "riesgo": "Bajo"}, {"x": 1.88, "y": 8, "riesgo": "Bajo"}, {"x": 3.85, "y": 4, "riesgo": "Alto"}, {"x": 4.21, "y": 3, "riesgo": "Crítico"}, {"x": 4.18, "y": 3, "riesgo": "Alto"}, {"x": 3.79, "y": 2, "riesgo": "Alto"}, {"x": 1.99, "y": 8, "riesgo": "Bajo"}, {"x": 3.61, "y": 3, "riesgo": "Alto"}, {"x": 3.68, "y": 4, "riesgo": "Alto"}, {"x": 1.69, "y": 9, "riesgo": "Bajo"}, {"x": 4.27, "y": 3, "riesgo": "Crítico"}, {"x": 2.96, "y": 6, "riesgo": "Medio"}], "colors": {"Bajo": "#4fc3f7", "Medio": "#1976d2", "Alto": "#0d47a1", "Crítico": "#37474f"}}, "c5": {"labels": ["Derecho", "Danza", "Licenciatura", "Artes Plásticas", "Medicina", "Administración", "Música", "Psicología", "Ingeniería"], "data": [2.38, 2.87, 2.9, 3.1, 3.24, 3.25, 3.4, 3.56, 3.6]}, "c6": {"labels": ["Estrato 1", "Estrato 2", "Estrato 3", "Estrato 4", "Estrato 5", "Estrato 6"], "depresion": [3.13, 3.33, 3.07, 2.83, 2.88, 2.6], "estres": [3.16, 3.35, 3.4, 3.1, 3.74, 3.0]}, "c7": {"labels": ["Presencial", "Virtual", "Híbrida"], "datasets": [{"label": "Bajo", "data": [8, 7, 6], "backgroundColor": "#4fc3f7"}, {"label": "Medio", "data": [17, 13, 7], "backgroundColor": "#1976d2"}, {"label": "Alto", "data": [11, 6, 9], "backgroundColor": "#0d47a1"}, {"label": "Crítico", "data": [3, 5, 4], "backgroundColor": "#37474f"}]}, "c8": {"labels": ["Bajo", "Medio", "Alto", "Crítico"], "trabaja": [25.8, 35.5, 25.8, 12.9], "no_trabaja": [20.0, 40.0, 27.7, 12.3]}, "c9": {"labels": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], "estres": [2.64, 3.57, 3.66, 3.7, 3.58, 3.34, 3.5, 2.88, 3.3, 3.1], "depresion": [2.74, 3.14, 3.72, 3.18, 3.2, 2.96, 3.4, 2.85, 3.05, 3.13], "ansiedad": [2.76, 3.31, 3.88, 3.32, 3.18, 2.89, 3.45, 2.88, 2.98, 3.43]}, "c10": {"labels": ["Estrés", "Ansiedad", "Depresión", "Sueño", "Apoyo Social", "Carga Acad.", "Hábitos"], "valores": [43.8, 38.5, 34.4, 34.4, 41.7, 42.7, 30.2]}, "c11": [{"genero": "Masculino", "pct": 40.6, "n": 39, "score": 3.45, "pct_riesgo": 51.3, "dim_mayor": "Apoyo Social"}, {"genero": "Femenino", "pct": 53.1, "n": 51, "score": 2.95, "pct_riesgo": 31.4, "dim_mayor": "Estrés"}, {"genero": "Otro", "pct": 6.2, "n": 6, "score": 3.28, "pct_riesgo": 33.3, "dim_mayor": "Estrés"}], "c12": {"labels": ["Bajo", "Medio", "Alto", "Crítico"], "data": [1.78, 2.9, 3.76, 4.28], "colors": ["#4fc3f7", "#1976d2", "#0d47a1", "#37474f"]}, "conc": {"genero": ["El grupo 'Masculino' concentra el mayor porcentaje en riesgo Alto/Crítico (51.3%).", "'Masculino' presenta el score total promedio más alto (3.45), indicando mayor vulnerabilidad general.", "La dimensión más crítica varía por género: Masculino → Apoyo Social · Femenino → Estrés · Otro → Estrés."], "riesgo": ["El 12.5% de los estudiantes se encuentra en nivel Crítico, requiriendo intervención inmediata.", "Solo el 21.9% está en riesgo Bajo, evidenciando un panorama de bienestar comprometido en la mayoría.", "'Estrés' es la dimensión con mayor score promedio; 'Hábitos de Estudio' la más protegida."], "rings": ["'Estrés' es la dimensión con más estudiantes en riesgo (43.8%).", "'Hábitos' es la dimensión más protegida, con 30.2% en riesgo.", "Ninguna dimensión supera el 50% de estudiantes en riesgo."], "academica": ["El semestre 7 concentra el mayor % de estudiantes en riesgo Alto/Crítico (75.0%).", "El estrés alcanza su pico en el semestre 4, coincidiendo con la etapa de mayor carga académica.", "El semestre 8 presenta la situación más favorable, con solo 12.5% en riesgo elevado."], "bienestar_programa": ["La correlación entre score total y bienestar global es -0.89 — a mayor riesgo, menor bienestar percibido.", "'Ingeniería' tiene el score de riesgo más alto (3.6); 'Derecho' el más bajo (2.38).", "La diferencia entre el programa más y menos vulnerable es de 1.22 puntos."], "estrato_modalidad": ["El estrato 2 registra el score de depresión más alto (3.33), reflejando mayor vulnerabilidad socioeconómica.", "La modalidad 'Virtual' concentra la mayor cantidad de estudiantes en nivel Crítico.", "Los estratos 1 y 2 muestran consistentemente scores más elevados en depresión y estrés."], "trabajo_sueno": ["Estudiantes que trabajan tienen 38.7% en riesgo Alto/Crítico vs 40.0% entre quienes no trabajan.", "El score de sueño escala de 1.78 (riesgo Bajo) a 4.28 (Crítico), evidenciando el impacto del descanso en la salud mental.", "El trabajo y el mal sueño se refuerzan mutuamente como factores de riesgo acumulados."]}};
+
+// ── KPI cards ────────────────────────────────────────────────────────────────
+const kpiEl = document.getElementById('kpis');
+const kpis = [
+  { label: 'Total estudiantes',     value: D.kpis.total,             sub: 'registros analizados',        cls: 'success' },
+  { label: 'En riesgo Alto o Crítico', value: D.kpis.pct_alto_critico + '%', sub: D.kpis.n_critico + ' en nivel Crítico', cls: 'warning' },
+  { label: 'Dimensión más crítica', value: D.kpis.dim_mayor,         sub: 'mayor score promedio',        cls: '' },
+  { label: 'Bienestar global prom.',value: D.kpis.bienestar_prom + '/10', sub: 'escala 1–10',            cls: 'critico' },
+];
+kpis.forEach(k => {
+  kpiEl.innerHTML += `<div class="kpi-card ${k.cls}">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value">${k.value}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`;
+});
+
+// ── C1: Doughnut ─────────────────────────────────────────────────────────────
+new Chart(document.getElementById('c1'), {
+  type: 'doughnut',
+  data: {
+    labels: D.c1.labels,
+    datasets: [{ data: D.c1.data, backgroundColor: D.c1.colors, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '60%',
+  }
+});
+
+// ── C2: Radar ────────────────────────────────────────────────────────────────
+new Chart(document.getElementById('c2'), {
+  type: 'radar',
+  data: {
+    labels: D.c2.labels,
+    datasets: [{
+      label: 'Score promedio',
+      data: D.c2.data,
+      backgroundColor: 'rgba(25,118,210,.15)',
+      borderColor: '#1976d2',
+      pointBackgroundColor: '#1976d2',
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    scales: { r: { min: 1, max: 5, ticks: { stepSize: 1 } } },
+    plugins: { legend: { display: false } },
+  }
+});
+
+// ── C3: Stacked bar semestre ──────────────────────────────────────────────────
+new Chart(document.getElementById('c3'), {
+  type: 'bar',
+  data: { labels: D.c3.labels, datasets: D.c3.datasets },
+  options: {
+    scales: { x: { stacked: true }, y: { stacked: true, ticks: { stepSize: 1 } } },
+    plugins: { legend: { position: 'bottom' } },
+  }
+});
+
+// ── C4: Scatter ───────────────────────────────────────────────────────────────
+const scatterColors = D.c4.data.map(p => D.c4.colors[p.riesgo]);
+new Chart(document.getElementById('c4'), {
+  type: 'scatter',
+  data: {
+    datasets: [{
+      label: 'Estudiantes',
+      data: D.c4.data.map(p => ({ x: p.x, y: p.y })),
+      backgroundColor: scatterColors,
+      pointRadius: 5,
+      pointHoverRadius: 7,
+    }]
+  },
+  options: {
+    scales: {
+      x: { title: { display: true, text: 'Score total ponderado' } },
+      y: { title: { display: true, text: 'Bienestar global (1-10)' }, min: 1, max: 10 },
+    },
+    plugins: { legend: { display: false } },
+  }
+});
+
+// ── C5: Horizontal bar programas ──────────────────────────────────────────────
+new Chart(document.getElementById('c5'), {
+  type: 'bar',
+  data: {
+    labels: D.c5.labels,
+    datasets: [{
+      label: 'Score promedio',
+      data: D.c5.data,
+      backgroundColor: '#1976d2',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    scales: { x: { min: 1, max: 5 } },
+    plugins: { legend: { display: false } },
+  }
+});
+
+// ── C6: Grouped bar estrato ───────────────────────────────────────────────────
+new Chart(document.getElementById('c6'), {
+  type: 'bar',
+  data: {
+    labels: D.c6.labels,
+    datasets: [
+      { label: 'Depresión', data: D.c6.depresion, backgroundColor: '#0d47a1', borderRadius: 4 },
+      { label: 'Estrés',    data: D.c6.estres,    backgroundColor: '#4fc3f7', borderRadius: 4 },
+    ]
+  },
+  options: {
+    scales: { y: { min: 1, max: 5 } },
+    plugins: { legend: { position: 'bottom' } },
+  }
+});
+
+// ── C7: Grouped bar modalidad ─────────────────────────────────────────────────
+new Chart(document.getElementById('c7'), {
+  type: 'bar',
+  data: { labels: D.c7.labels, datasets: D.c7.datasets },
+  options: {
+    scales: { y: { ticks: { stepSize: 1 } } },
+    plugins: { legend: { position: 'bottom' } },
+  }
+});
+
+// ── C8: Grouped bar trabaja ───────────────────────────────────────────────────
+new Chart(document.getElementById('c8'), {
+  type: 'bar',
+  data: {
+    labels: D.c8.labels,
+    datasets: [
+      { label: 'Trabaja',    data: D.c8.trabaja,    backgroundColor: '#0d47a1', borderRadius: 4 },
+      { label: 'No trabaja', data: D.c8.no_trabaja, backgroundColor: '#90caf9', borderRadius: 4 },
+    ]
+  },
+  options: {
+    scales: {
+      y: {
+        min: 0, max: 100,
+        ticks: { callback: v => v + '%' },
+      },
+    },
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%`,
+        },
+      },
+    },
+  }
+});
+
+// ── Conclusiones ─────────────────────────────────────────────────────────────
+function renderConc(id, bullets) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '<ul>' + bullets.map(b => `<li>${b}</li>`).join('') + '</ul>';
+}
+renderConc('conc-riesgo',              D.conc.riesgo);
+renderConc('conc-rings',               D.conc.rings);
+renderConc('conc-academica',           D.conc.academica);
+renderConc('conc-bienestar-programa',  D.conc.bienestar_programa);
+renderConc('conc-estrato-modalidad',   D.conc.estrato_modalidad);
+renderConc('conc-trabajo-sueno',       D.conc.trabajo_sueno);
+
+// También para género (debajo de la gender card, renderizado aparte)
+const gCard = document.querySelector('.gender-card');
+if (gCard) {
+  const concDiv = document.createElement('div');
+  concDiv.className = 'conc-card';
+  concDiv.style.marginTop = '12px';
+  concDiv.innerHTML = '<ul>' + D.conc.genero.map(b => `<li>${b}</li>`).join('') + '</ul>';
+  gCard.appendChild(concDiv);
+}
+
+// ── C11: Gender infographic ───────────────────────────────────────────────────
+const GENDER_ICONS = {
+  Masculino: `<svg width="64" height="120" viewBox="0 0 64 120" fill="none">
+    <circle cx="32" cy="16" r="13" fill="#90caf9"/>
+    <rect x="20" y="32" width="24" height="36" rx="5" fill="#90caf9"/>
+    <rect x="8"  y="32" width="11" height="9"  rx="4" fill="#90caf9"/>
+    <rect x="45" y="32" width="11" height="9"  rx="4" fill="#90caf9"/>
+    <rect x="20" y="65" width="10" height="36" rx="4" fill="#90caf9"/>
+    <rect x="34" y="65" width="10" height="36" rx="4" fill="#90caf9"/>
+  </svg>`,
+  Femenino: `<svg width="64" height="120" viewBox="0 0 64 120" fill="none">
+    <circle cx="32" cy="16" r="13" fill="#e3f2fd"/>
+    <rect x="22" y="32" width="20" height="18" rx="4" fill="#e3f2fd"/>
+    <polygon points="32,48 8,100 56,100" fill="#e3f2fd"/>
+    <rect x="8"  y="32" width="13" height="9" rx="4" fill="#e3f2fd"/>
+    <rect x="43" y="32" width="13" height="9" rx="4" fill="#e3f2fd"/>
+    <rect x="19" y="98" width="10" height="20" rx="4" fill="#e3f2fd"/>
+    <rect x="35" y="98" width="10" height="20" rx="4" fill="#e3f2fd"/>
+  </svg>`,
+  Otro: `<svg width="64" height="120" viewBox="0 0 64 120" fill="none">
+    <circle cx="32" cy="16" r="13" fill="#b3e5fc"/>
+    <rect x="20" y="32" width="24" height="30" rx="5" fill="#b3e5fc"/>
+    <polygon points="32,60 14,95 50,95" fill="#b3e5fc"/>
+    <rect x="8"  y="32" width="11" height="9" rx="4" fill="#b3e5fc"/>
+    <rect x="45" y="32" width="11" height="9" rx="4" fill="#b3e5fc"/>
+    <rect x="20" y="93" width="10" height="24" rx="4" fill="#b3e5fc"/>
+    <rect x="34" y="93" width="10" height="24" rx="4" fill="#b3e5fc"/>
+  </svg>`,
+};
+
+const g11 = document.getElementById('c11');
+D.c11.forEach(g => {
+  g11.innerHTML += `
+    <div class="gender-item">
+      <div class="gender-icon">${GENDER_ICONS[g.genero] || ''}</div>
+      <div class="gender-info">
+        <div class="gender-pct">${g.pct}%</div>
+        <div class="gender-name">${g.genero}</div>
+        <div class="gender-stat">
+          <strong>${g.n}</strong> estudiantes<br>
+          Score promedio: <strong>${g.score}</strong><br>
+          En riesgo Alto/Crítico: <strong>${g.pct_riesgo}%</strong><br>
+          Dimensión más crítica: <strong>${g.dim_mayor}</strong>
+        </div>
+      </div>
+    </div>`;
+});
+
+// ── C12: Bar — score sueño por nivel de riesgo ───────────────────────────────
+new Chart(document.getElementById('c12'), {
+  type: 'bar',
+  data: {
+    labels: D.c12.labels,
+    datasets: [{
+      label: 'Score sueño promedio',
+      data: D.c12.data,
+      backgroundColor: D.c12.colors,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    scales: {
+      y: { min: 1, max: 5, title: { display: true, text: 'Score promedio (1–5)' } },
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` Score: ${ctx.parsed.y}` } },
+    },
+  }
+});
+
+// ── C9: Smooth area — evolución scores por semestre ───────────────────────────
+new Chart(document.getElementById('c9'), {
+  type: 'line',
+  data: {
+    labels: D.c9.labels,
+    datasets: [
+      {
+        label: 'Estrés',
+        data: D.c9.estres,
+        borderColor: '#0d47a1',
+        backgroundColor: 'rgba(13,71,161,.12)',
+        fill: true, tension: 0.4, borderWidth: 2.5,
+        pointBackgroundColor: '#0d47a1', pointRadius: 4,
+      },
+      {
+        label: 'Depresión',
+        data: D.c9.depresion,
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,.10)',
+        fill: true, tension: 0.4, borderWidth: 2.5,
+        pointBackgroundColor: '#1976d2', pointRadius: 4,
+      },
+      {
+        label: 'Ansiedad',
+        data: D.c9.ansiedad,
+        borderColor: '#4fc3f7',
+        backgroundColor: 'rgba(79,195,247,.10)',
+        fill: true, tension: 0.4, borderWidth: 2.5,
+        pointBackgroundColor: '#4fc3f7', pointRadius: 4,
+      },
+    ]
+  },
+  options: {
+    scales: {
+      y: { min: 1, max: 5, title: { display: true, text: 'Score promedio' } },
+      x: { title: { display: true, text: 'Semestre' } },
+    },
+    plugins: { legend: { position: 'bottom' } },
+    spanGaps: true,
+  }
+});
+
+// ── C10: Radial rings — % en riesgo por dimensión ─────────────────────────────
+const ringColors = ['#0d47a1','#1565c0','#1976d2','#1e88e5','#42a5f5','#64b5f6','#90caf9'];
+const R = 37, CIRC = 2 * Math.PI * R;
+const container = document.getElementById('c10');
+D.c10.labels.forEach((label, i) => {
+  const pct = D.c10.valores[i];
+  const offset = CIRC * (1 - pct / 100);
+  container.innerHTML += `
+    <div class="ring-item">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 90 90">
+          <circle class="ring-track" cx="45" cy="45" r="${R}"/>
+          <circle class="ring-fill" cx="45" cy="45" r="${R}"
+            stroke="${ringColors[i]}"
+            stroke-dasharray="${CIRC.toFixed(1)}"
+            stroke-dashoffset="${offset.toFixed(1)}"/>
+        </svg>
+        <div class="ring-label">${pct}%</div>
+      </div>
+      <div class="ring-name">${label}</div>
+    </div>`;
+});
+</script>
+</body>
+</html>
