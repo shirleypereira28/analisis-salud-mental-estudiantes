@@ -33,6 +33,32 @@ analisis-salud-mental-estudiantes/
 ```bash
 pip install numpy pandas
 ```
+## Instrumento de encuesta
+
+El instrumento completo está documentado en `docs/instrumento_encuesta.md`.
+
+| Sección | Ítems |
+|---|---|
+| Datos demográficos | 8 |
+| Estrés (E1–E5) | 5 |
+| Ansiedad (A1–A5) | 5 |
+| Carga Académica (C1–C5) | 5 |
+| Hábitos de Estudio (H1–H5) | 5 |
+| Depresión (D1–D5) | 5 |
+| Sueño (S1–S5) | 5 |
+| Apoyo Social (AP1–AP5) | 5 |
+| Bienestar global (B1) | 1 |
+| **Total** | **44** |
+
+---
+## Metodología
+
+- **Enfoque:** Cuantitativo — alcance descriptivo
+- **Instrumento:** Encuesta estructurada, 7 dimensiones, escalas Likert 1–5
+- **Procesamiento:** Python — numpy, pandas
+- **Visualización:** Dashboard HTML autocontenido con Chart.js 4.4
+- **Datos:** 96 registros simulados con correlaciones contextuales realistas (seed = 42)
+- **Nivel TRL:** 5 — Prototipo funcional validado en entorno relevante
 
 ---
 
@@ -110,24 +136,6 @@ start dashboard/index.html
 
 ---
 
-## Instrumento de encuesta
-
-El instrumento completo está documentado en `docs/instrumento_encuesta.md`.
-
-| Sección | Ítems |
-|---|---|
-| Datos demográficos | 8 |
-| Estrés (E1–E5) | 5 |
-| Ansiedad (A1–A5) | 5 |
-| Carga Académica (C1–C5) | 5 |
-| Hábitos de Estudio (H1–H5) | 5 |
-| Depresión (D1–D5) | 5 |
-| Sueño (S1–S5) | 5 |
-| Apoyo Social (AP1–AP5) | 5 |
-| Bienestar global (B1) | 1 |
-| **Total** | **44** |
-
----
 
 ## Dashboard — Visualizaciones
 
@@ -147,11 +155,4 @@ Cada grupo incluye una **card de conclusiones dinámicas** (2–3 bullets calcul
 
 ---
 
-## Metodología
 
-- **Enfoque:** Cuantitativo — alcance descriptivo
-- **Instrumento:** Encuesta estructurada, 7 dimensiones, escalas Likert 1–5
-- **Procesamiento:** Python — numpy, pandas
-- **Visualización:** Dashboard HTML autocontenido con Chart.js 4.4
-- **Datos:** 96 registros simulados con correlaciones contextuales realistas (seed = 42)
-- **Nivel TRL:** 5 — Prototipo funcional validado en entorno relevante
