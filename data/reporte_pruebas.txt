@@ -1,0 +1,62 @@
+══════════════════════════════════════════════════════════════
+  SUITE DE PRUEBAS — Sistema de Bienestar Estudiantil TRL5
+  Fecha: 2026-05-20 16:45:27
+  Dataset raw  : encuesta_raw.csv  (96 registros)
+  Dataset proc : encuesta_procesada.csv  (96 registros)
+══════════════════════════════════════════════════════════════
+
+GRUPO: Integridad de datos raw
+──────────────────────────────────────────────────────────────
+  [PASS] T01 — Número de registros (96 esperados)
+         → Registros encontrados: 96 (esperado: 96)
+  [PASS] T02 — Columnas requeridas presentes (44 columnas)
+         → Todas las columnas presentes (45)
+  [PASS] T03 — Sin valores nulos en dataset raw
+         → Valores nulos encontrados: 0
+  [PASS] T04 — Rango válido ítems Likert [1–5]
+         → Todos los 3360 ítems Likert en [1,5]
+  [PASS] T05 — Rangos demográficos válidos
+         → Todos los rangos demográficos válidos
+  [PASS] T06 — Valores categóricos permitidos
+         → Todos los campos categóricos con valores permitidos
+
+GRUPO: Cálculo de scores
+──────────────────────────────────────────────────────────────
+  [PASS] T07 — Score por dimensión = promedio de ítems
+         → Los 7 scores de dimensión coinciden con el promedio de sus ítems (tol=0.01)
+  [PASS] T08 — Score total = promedio ponderado correcto
+         → score_total coincide con la fórmula ponderada (desviación máx: 0.0000)
+  [PASS] T09 — Pesos normalizados (suma = 1.0)
+         → Suma de pesos: 1.0 (esperado: 1.0)
+  [PASS] T10 — Rango de scores calculados [1.0–5.0]
+         → Todos los scores calculados en [1.0, 5.0]
+
+GRUPO: Clasificación de riesgo
+──────────────────────────────────────────────────────────────
+  [PASS] T11 — Clasificación Bajo  (score < 2.5)
+         → 21 registros con score<2.5 y D4<4 → todos clasificados Bajo
+  [PASS] T12 — Clasificación Medio (2.5 ≤ score < 3.5)
+         → 37 registros en rango Medio sin D4 → todos clasificados Medio
+  [PASS] T13 — Clasificación Alto  (3.5 ≤ score < 4.2)
+         → 26 registros en rango Alto sin D4 → todos clasificados Alto
+  [PASS] T14 — Clasificación Crítico por score (≥ 4.2)
+         → 11 registros con score≥4.2 → todos clasificados Crítico
+  [PASS] T15 — Bandera D4 activa Crítico (independiente)
+         → 8 registros con D4≥4 → todos clasificados Crítico (bandera independiente)
+
+GRUPO: Validación estadística
+──────────────────────────────────────────────────────────────
+  [PASS] T16 — Correlación negativa score ↔ bienestar
+         → Correlación score_total ↔ B1: r=-0.89 (esperado < -0.5)
+  [PASS] T17 — Separación monótona entre niveles de riesgo
+         → Score promedio por nivel: Bajo(1.97) < Medio(3.02) < Alto(3.81) < Crítico(4.38)
+  [PASS] T18 — Efecto del trabajo en score de estrés
+         → Score estrés: trabaja=3.42 > no trabaja=3.26 (diferencia=0.16)
+  [PASS] T19 — Efecto del estrato en score de depresión
+         → Score depresión: estrato 1–2=3.24 > estrato 4–6=2.84 (diferencia=0.4)
+  [PASS] T20 — Distribución próxima al objetivo (±10)
+         → Distribución vs objetivo (tol≤10): Bajo: obs=21 obj=24 Δ=3 | Medio: obs=37 obj=43 Δ=6 | Alto: obs=26 obj=21 Δ=5 | Crítico: obs=12 obj=8 Δ=4
+
+══════════════════════════════════════════════════════════════
+  RESULTADO FINAL: 20/20 pruebas APROBADAS (100.0%)
+══════════════════════════════════════════════════════════════
