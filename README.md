@@ -17,15 +17,12 @@ Simulacion/
 │   ├── generar_datos.py          # Genera la base de datos simulada
 │   ├── procesar_datos.py         # Calcula scores y clasifica riesgo
 │   ├── exportar_dashboard.py     # Genera el dashboard HTML autocontenido
-│   ├── pruebas_sistema.py        # Suite de 20 pruebas estructuradas
-│   └── exportar_informe_pdf.py   # Genera el PDF de validación para el informe
+│   └── pruebas_sistema.py        # Suite de 20 pruebas estructuradas
 ├── dashboard/
 │   └── index.html                # Dashboard interactivo (sin servidor requerido)
 ├── docs/
 │   ├── instrumento_encuesta.md   # Definición formal del instrumento
-│   ├── trazabilidad_objetivos.md # Matriz de trazabilidad objetivos–evidencias
-│   └── anexo_validacion.pdf      # Anexo de validación para el informe
-├── SPEC.md                       # Especificación técnica completa
+│  
 └── README.md
 ```
 
@@ -39,7 +36,7 @@ Simulacion/
 ### Instalación de dependencias
 
 ```bash
-pip install numpy pandas reportlab
+pip install numpy pandas
 ```
 
 ---
@@ -103,9 +100,7 @@ python src/pruebas_sistema.py
 
 **Salida:** `data/reporte_pruebas.txt`
 
-Ejecuta 20 casos de prueba en 4 grupos: integridad de datos, cálculo de scores, clasificación de riesgo y validación estadística. Imprime el resultado por consola y guarda el reporte completo.
-
-**Resultado esperado:** 20/20 pruebas APROBADAS (100%)
+Ejecuta 20 casos de prueba en 4 grupos y guarda el reporte completo con detalle por caso. Resultado esperado: **20/20 pruebas aprobadas (100%)**.
 
 ---
 
@@ -117,7 +112,7 @@ python src/exportar_dashboard.py
 
 **Salida:** `dashboard/index.html`
 
-Genera un archivo HTML autocontenido con 12 visualizaciones interactivas, 4 tarjetas KPI, conclusiones dinámicas y una sección de **Validación del Sistema** con métricas de desempeño y tabla de trazabilidad.
+Genera un archivo HTML autocontenido con 12 visualizaciones interactivas, 4 tarjetas KPI, conclusiones dinámicas y una sección de validación del sistema con métricas de desempeño y tabla de trazabilidad.
 
 ```bash
 # macOS
@@ -129,25 +124,6 @@ xdg-open dashboard/index.html
 # Windows
 start dashboard/index.html
 ```
-
----
-
-### Paso 5 — Exportar PDF de validación
-
-```bash
-python src/exportar_informe_pdf.py
-```
-
-**Salida:** `docs/anexo_validacion.pdf`
-
-Genera un PDF de 4 páginas para adjuntar al informe académico:
-
-| Página | Contenido |
-|---|---|
-| 1 | Portada, ficha del proyecto y contexto del feedback atendido |
-| 2 | Suite de 20 pruebas estructuradas con resultados por caso |
-| 3 | Métricas cuantificables de desempeño (integridad, modelo, D4, distribución) |
-| 4 | Matriz de trazabilidad: objetivos específicos → entregables → evidencias |
 
 ---
 
@@ -185,14 +161,46 @@ El instrumento completo está documentado en `docs/instrumento_encuesta.md`.
 
 ---
 
-## Validación del prototipo
+## Pruebas estructuradas
 
-| Artefacto | Descripción |
+Suite de 20 casos de prueba organizados en 4 grupos que verifican el comportamiento completo del sistema:
+
+| Grupo | Pruebas | Descripción |
+|---|---|---|
+| Integridad de datos | T01–T06 | Número de registros, columnas, nulos, rangos Likert, rangos demográficos, valores categóricos |
+| Cálculo de scores | T07–T10 | Score por dimensión, score total ponderado, normalización de pesos, rango de scores |
+| Clasificación de riesgo | T11–T15 | Los 4 umbrales de clasificación + bandera D4 como criterio independiente |
+| Validación estadística | T16–T20 | Correlación score↔bienestar, separación monótona entre niveles, efectos contextuales, distribución |
+
+**Resultado:** 20/20 pruebas aprobadas · reporte detallado en `data/reporte_pruebas.txt`
+
+---
+
+## Métricas de desempeño del sistema
+
+Calculadas sobre el dataset procesado en cada ejecución del pipeline:
+
+| Métrica | Valor |
 |---|---|
-| `src/pruebas_sistema.py` | 20 casos de prueba en 4 grupos · 100% aprobados |
-| `data/reporte_pruebas.txt` | Reporte detallado con resultado por caso y timestamp |
-| `docs/trazabilidad_objetivos.md` | Matriz formal objetivo → entregable → evidencia cuantificable |
-| `docs/anexo_validacion.pdf` | PDF de 4 páginas para adjuntar al informe académico |
+| Completitud del dataset | 100% (0 valores nulos en 4.320 campos) |
+| Cobertura de rango Likert [1–5] | 100% (3.360 ítems validados) |
+| Correlación score total ↔ bienestar global | r = −0.89 (relación inversa confirmada) |
+| Separación entre niveles | Bajo(1.97) < Medio(3.02) < Alto(3.81) < Crítico(4.38) |
+| Casos Críticos detectados por bandera D4 | 8 estudiantes identificados por ideación, independientemente del score |
+| Desviación distribución vs. objetivo | ≤ 6 registros por nivel (dentro de tolerancia ±10) |
+
+---
+
+## Trazabilidad de objetivos
+
+La matriz completa está documentada en `docs/trazabilidad_objetivos.md`. Resumen:
+
+| Objetivo específico | Entregable | Pruebas |
+|---|---|---|
+| OE1 — Instrumento de recolección | `instrumento_encuesta.md` + `encuesta_raw.csv` | T01–T06 |
+| OE2 — Procesamiento y análisis | `procesar_datos.py` + `encuesta_procesada.csv` | T07–T10, T16–T19 |
+| OE3 — Dashboard interactivo | `exportar_dashboard.py` + `dashboard/index.html` | Validación visual |
+| OE4 — Validación del prototipo | `pruebas_sistema.py` + `reporte_pruebas.txt` | T01–T20 |
 
 ---
 
@@ -203,6 +211,5 @@ El instrumento completo está documentado en `docs/instrumento_encuesta.md`.
 - **Instrumento:** Encuesta estructurada, 7 dimensiones, escalas Likert 1–5
 - **Procesamiento:** Python — numpy, pandas
 - **Visualización:** Dashboard HTML autocontenido con Chart.js 4.4
-- **Exportación:** PDF generado con reportlab
 - **Datos:** 96 registros simulados con correlaciones contextuales realistas (seed = 42)
 - **Nivel TRL:** 5 — Prototipo funcional validado en entorno relevante
