@@ -1,3 +1,4 @@
+
 # Sistema de Análisis y Monitoreo del Bienestar y Salud Mental Estudiantil
 
 Prototipo funcional (TRL5) para la identificación temprana de factores de riesgo en la salud mental de estudiantes universitarios, mediante simulación de encuestas, análisis estadístico en Python y dashboard HTML interactivo con conclusiones dinámicas.
@@ -7,17 +8,24 @@ Prototipo funcional (TRL5) para la identificación temprana de factores de riesg
 ## Estructura del proyecto
 
 ```
-analisis-salud-mental-estudiantes/
+Simulacion/
 ├── data/
 │   ├── encuesta_raw.csv          # 96 registros simulados (respuestas crudas)
-│   └── encuesta_procesada.csv    # Datos con scores y nivel de riesgo calculados
+│   ├── encuesta_procesada.csv    # Datos con scores y nivel de riesgo calculados
+│   └── reporte_pruebas.txt       # Resultado de la suite de 20 pruebas estructuradas
 ├── src/
 │   ├── generar_datos.py          # Genera la base de datos simulada
 │   ├── procesar_datos.py         # Calcula scores y clasifica riesgo
-│   └── exportar_dashboard.py     # Genera el dashboard HTML autocontenido
+│   ├── exportar_dashboard.py     # Genera el dashboard HTML autocontenido
+│   ├── pruebas_sistema.py        # Suite de 20 pruebas estructuradas
+│   └── exportar_informe_pdf.py   # Genera el PDF de validación para el informe
 ├── dashboard/
 │   └── index.html                # Dashboard interactivo (sin servidor requerido)
-├── instrumento_encuesta.md   # Definición formal del instrumento
+├── docs/
+│   ├── instrumento_encuesta.md   # Definición formal del instrumento
+│   ├── trazabilidad_objetivos.md # Matriz de trazabilidad objetivos–evidencias
+│   └── anexo_validacion.pdf      # Anexo de validación para el informe
+├── SPEC.md                       # Especificación técnica completa
 └── README.md
 ```
 
@@ -31,40 +39,14 @@ analisis-salud-mental-estudiantes/
 ### Instalación de dependencias
 
 ```bash
-pip install numpy pandas
+pip install numpy pandas reportlab
 ```
-## Instrumento de encuesta
-
-El instrumento completo está documentado en `docs/instrumento_encuesta.md`.
-
-| Sección | Ítems |
-|---|---|
-| Datos demográficos | 8 |
-| Estrés (E1–E5) | 5 |
-| Ansiedad (A1–A5) | 5 |
-| Carga Académica (C1–C5) | 5 |
-| Hábitos de Estudio (H1–H5) | 5 |
-| Depresión (D1–D5) | 5 |
-| Sueño (S1–S5) | 5 |
-| Apoyo Social (AP1–AP5) | 5 |
-| Bienestar global (B1) | 1 |
-| **Total** | **44** |
-
----
-## Metodología
-
-- **Enfoque:** Cuantitativo — alcance descriptivo
-- **Instrumento:** Encuesta estructurada, 7 dimensiones, escalas Likert 1–5
-- **Procesamiento:** Python — numpy, pandas
-- **Visualización:** Dashboard HTML autocontenido con Chart.js 4.4
-- **Datos:** 96 registros simulados con correlaciones contextuales realistas (seed = 42)
-- **Nivel TRL:** 5 — Prototipo funcional validado en entorno relevante
 
 ---
 
 ## Ejecución paso a paso
 
-Los tres scripts deben ejecutarse en orden desde la raíz del proyecto.
+Los scripts deben ejecutarse en orden desde la raíz del proyecto.
 
 ### Paso 1 — Generar datos simulados
 
@@ -113,7 +95,21 @@ Calcula el score por dimensión y el score total ponderado. Clasifica cada estud
 
 ---
 
-### Paso 3 — Generar dashboard HTML
+### Paso 3 — Ejecutar pruebas estructuradas
+
+```bash
+python src/pruebas_sistema.py
+```
+
+**Salida:** `data/reporte_pruebas.txt`
+
+Ejecuta 20 casos de prueba en 4 grupos: integridad de datos, cálculo de scores, clasificación de riesgo y validación estadística. Imprime el resultado por consola y guarda el reporte completo.
+
+**Resultado esperado:** 20/20 pruebas APROBADAS (100%)
+
+---
+
+### Paso 4 — Generar dashboard HTML
 
 ```bash
 python src/exportar_dashboard.py
@@ -121,7 +117,7 @@ python src/exportar_dashboard.py
 
 **Salida:** `dashboard/index.html`
 
-Genera un archivo HTML autocontenido con 12 visualizaciones interactivas, infografía de género, 4 tarjetas KPI, card de guía de lectura y conclusiones dinámicas por grupo de gráficas. No requiere servidor.
+Genera un archivo HTML autocontenido con 12 visualizaciones interactivas, 4 tarjetas KPI, conclusiones dinámicas y una sección de **Validación del Sistema** con métricas de desempeño y tabla de trazabilidad.
 
 ```bash
 # macOS
@@ -136,10 +132,45 @@ start dashboard/index.html
 
 ---
 
+### Paso 5 — Exportar PDF de validación
+
+```bash
+python src/exportar_informe_pdf.py
+```
+
+**Salida:** `docs/anexo_validacion.pdf`
+
+Genera un PDF de 4 páginas para adjuntar al informe académico:
+
+| Página | Contenido |
+|---|---|
+| 1 | Portada, ficha del proyecto y contexto del feedback atendido |
+| 2 | Suite de 20 pruebas estructuradas con resultados por caso |
+| 3 | Métricas cuantificables de desempeño (integridad, modelo, D4, distribución) |
+| 4 | Matriz de trazabilidad: objetivos específicos → entregables → evidencias |
+
+---
+
+## Instrumento de encuesta
+
+El instrumento completo está documentado en `docs/instrumento_encuesta.md`.
+
+| Sección | Ítems |
+|---|---|
+| Datos demográficos | 8 |
+| Estrés (E1–E5) | 5 |
+| Ansiedad (A1–A5) | 5 |
+| Carga Académica (C1–C5) | 5 |
+| Hábitos de Estudio (H1–H5) | 5 |
+| Depresión (D1–D5) | 5 |
+| Sueño (S1–S5) | 5 |
+| Apoyo Social (AP1–AP5) | 5 |
+| Bienestar global (B1) | 1 |
+| **Total** | **44** |
+
+---
 
 ## Dashboard — Visualizaciones
-
-El dashboard sigue una jerarquía de lo general a lo específico:
 
 | Nivel | Contenido |
 |---|---|
@@ -150,9 +181,28 @@ El dashboard sigue una jerarquía de lo general a lo específico:
 | 3 — % en riesgo | Radial progress rings por las 7 dimensiones |
 | 4 — Progresión académica | Stacked bar por semestre + Smooth area chart de scores críticos |
 | 5 — Segmentación | Scatter · Programa · Estrato · Modalidad · Trabajo · Sueño |
-
-Cada grupo incluye una **card de conclusiones dinámicas** (2–3 bullets calculados desde los datos reales).
+| 6 — Validación | Métricas de desempeño del sistema + tabla de trazabilidad por objetivo |
 
 ---
 
+## Validación del prototipo
 
+| Artefacto | Descripción |
+|---|---|
+| `src/pruebas_sistema.py` | 20 casos de prueba en 4 grupos · 100% aprobados |
+| `data/reporte_pruebas.txt` | Reporte detallado con resultado por caso y timestamp |
+| `docs/trazabilidad_objetivos.md` | Matriz formal objetivo → entregable → evidencia cuantificable |
+| `docs/anexo_validacion.pdf` | PDF de 4 páginas para adjuntar al informe académico |
+
+---
+
+## Metodología
+
+- **Enfoque:** Cuantitativo — alcance descriptivo
+- **Marco:** CDIO — Metodología: Scrum
+- **Instrumento:** Encuesta estructurada, 7 dimensiones, escalas Likert 1–5
+- **Procesamiento:** Python — numpy, pandas
+- **Visualización:** Dashboard HTML autocontenido con Chart.js 4.4
+- **Exportación:** PDF generado con reportlab
+- **Datos:** 96 registros simulados con correlaciones contextuales realistas (seed = 42)
+- **Nivel TRL:** 5 — Prototipo funcional validado en entorno relevante
